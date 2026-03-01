@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ArrowRight, Github } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+    const router = useRouter()
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -37,7 +39,7 @@ export default function Home() {
                 </p>
 
                 <div className="animate-item flex flex-wrap justify-center gap-4 pt-4">
-                    <Button size="lg" className="rounded-lg px-12 py-6 text-lg bg-amber-600 hover:bg-amber-700 text-white gap-2 group">
+                    <Button onClick={() => router.push("/register")} size="lg" className="rounded-lg px-12 py-6 text-lg bg-amber-600 hover:bg-amber-700 text-white gap-2 group">
                         Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <Button size="lg" variant="outline" className="rounded- lg px-12 py-6 text-lg gap-2">

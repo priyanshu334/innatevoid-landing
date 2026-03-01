@@ -1,62 +1,174 @@
-"use client"
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
-const shema = z.object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters long"),
-});
-type RegisterSchema = z.infer<typeof shema>;
+const schema = z
+    .object({
+        email: z
+            .string()
+            .min(1, "Email is required")
+            .email("Please enter a valid email"),
+        password: z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .regex(/[A-Z]/, "Must include at least one uppercase letter")
+            .regex(/[0-9]/, "Must include at least one number"),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });
+
+type LoginSchema = z.infer<typeof schema>;
+
 export default function RegisterPage() {
-    const router = useRouter()
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<RegisterSchema>({
-        resolver: zodResolver(shema),
+        resolver: zodResolver(schema),
     });
-    const onSubmit = (data: RegisterSchema) => {
-        toast.success("Registered successfully")
-        router.push("/home")
-        console.log(data);
 
+    const onSubmit = async (data: RegisterSchema) => {
+        try {
+            setLoading(true);
+
+            // Simulate API call
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+
+            toast.success("Account created successfully 🎉");
+            router.push("/home");
+
+            console.log(data);
+        } catch (error) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
     };
 
-
     return (
-        <div className="min-h-screen px-6 py-4 max-w-6xl mx-auto">
+        <div className="flex min-h-screen items-center justify-center px-6 bg-background">
+            <div className="w-full max-w-md space-y-6">
 
-            <Card className="p-6">
-                <CardHeader>
-                    <CardTitle>Register</CardTitle>
-                    <CardDescription>Register to get access to Innatevoid</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="flex flex-col gap-4">
-                            <Input {...register("email")} placeholder="Email" />
-                            <Input {...register("password")} placeholder="Password" />
-                            <Button type="submit">Register</Button>
+                {/* Back Button */}
+                <Link
+                    href="/home"
+                    className="flex items-center absolute top-4 left-4 gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+                >
+                    <ArrowLeft size={16} />
+                    Back to Home
+                </Link>
 
+                {/* Heading */}
+                <div className="text-center space-y-2">
+                    <h1 className="text-3xl font-bold leading-tight">
+                        Join the community of{" "}
+                        <span className="bg-gradient-to-r from-amber-600 to-yellow-400 bg-clip-text text-transparent">
+                            builders & innovators
+                        </span>
+                    </h1>
+                    <p className="text-muted-foreground text-sm">
+                        Unlock your full potential with Innatevoid
+                    </p>
+                </div>
 
-                        </div>
-                    </form>
-                </CardContent>
-                <CardFooter>
-                    <p>Already have an account? <Link href="/login">Login</Link></p>
-                </CardFooter>
-            </Card>
+                {/* Card */}
+                <Card className="shadow-lg">
+                    <CardHeader>
+                        <CardTitle>Create Account</CardTitle>
+                        <CardDescription>
+                            Enter your details to get started
+                        </CardDescription>
+                    </CardHeader>
 
+                    <CardContent>
+                        <form
+                            onSubmit={handleSubmit(onSubmit)}
+                            className="space-y-4"
+                        >
+                            {/* Email */}
+                            <div className="space-y-1">
+                                <Input
+                                    autoFocus
+                                    type="email"
+                                    placeholder="Email"
+                                    {...register("email")}
+                                />
+                                {errors.email && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.email.message}
+                                    </p>
+                                )}
+                            </div>
 
+                            {/* Password */}
+                            <div className="space-y-1">
+                                <Input
+                                    type="password"
+                                    placeholder="Password"
+                                    {...register("password")}
+                                />
+                                {errors.password && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.password.message}
+                                    </p>
+                                )}
+                            </div>
 
+                            {/* Confirm Password */}
+                            <div className="space-y-1">
+                                <Input
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    {...register("confirmPassword")}
+                                />
+                                {errors.confirmPassword && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.confirmPassword.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Submit */}
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={loading}
+                            >
+                                {loading ? "Creating account..." : "Create Account"}
+                            </Button>
+                        </form>
+                    </CardContent>
+
+                    <CardFooter className="flex justify-center text-sm">
+                        <p>
+                            Already have an account?{" "}
+                            <Link
+                                href="/login"
+                                className="text-amber-600 hover:underline"
+                            >
+                                Login
+                            </Link>
+                        </p>
+                    </CardFooter>
+                </Card>
+            </div>
         </div>
     );
 }
