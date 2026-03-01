@@ -12,6 +12,7 @@ import {
 import { ModeToggle } from "./ModeToggle";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { useRouter } from "next/navigation";
 
 const NavItems = [
     {
@@ -31,6 +32,8 @@ const NavItems = [
             { title: "Develope skills", href: "/skills" },
             { title: "Templates", href: "/templates" },
             { title: "Automations", href: "/automations" },
+            { title: "Roadmaps", href: "/resourses/roadmaps" }
+
         ],
     },
     {
@@ -44,7 +47,7 @@ const NavItems = [
     },
     {
         title: "About",
-        href: "#",
+        href: "/about",
     },
     {
         title: "Pricing",
@@ -53,6 +56,7 @@ const NavItems = [
 ];
 
 export function Navbar() {
+    const router = useRouter()
     const navRef = useRef<HTMLElement>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -144,12 +148,13 @@ export function Navbar() {
                     <div className="hidden sm:block">
                         <ModeToggle />
                     </div>
-                    <Button variant="ghost" size="sm" className="hidden md:flex rounded-full">
+                    <Button onClick={() => router.push("/login")} variant="ghost" size="sm" className="hidden md:flex ">
                         Login
                     </Button>
                     <Button
+                        onClick={() => router.push("/register")}
                         size="sm"
-                        className="px-6 rounded-full font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105"
+                        className="px-6 font-bold shadow-sm shadow-amber-800 transition-all hover:scale-105 bg-amber-800 text-white hover:bg-amber-900"
                     >
                         Join Now
                     </Button>
@@ -190,8 +195,8 @@ export function Navbar() {
                             </div>
                         ))}
                         <div className="pt-8 border-t border-border mt-4 flex flex-col gap-4">
-                            <Button className="w-full  py-6 text-lg font-bold rounded-lg bg-amber-800 text-white">Join Now</Button>
-                            <Button variant="outline" className="w-full rounded-lg py-6 text-lg">Login</Button>
+                            <Button onClick={() => router.push("/register")} className="w-full  py-6 text-lg font-bold rounded-lg bg-amber-800 text-white">Join Now</Button>
+                            <Button onClick={() => router.push("/login")} variant="outline" className="w-full rounded-lg py-6 text-lg">Login</Button>
                         </div>
                     </div>
                 </div>

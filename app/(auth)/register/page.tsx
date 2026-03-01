@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { ModeToggle } from "@/components/ModeToggle";
 
 const shema = z.object({
     email: z.string().email("Invalid email address"),
@@ -32,7 +34,17 @@ export default function RegisterPage() {
 
 
     return (
-        <div className="min-h-screen px-6 py-4 max-w-6xl mx-auto">
+        <div className="flex flex-col min-h-screen px-6 py-4 max-w-4xl mx-auto gap-4 items-center justify-center">
+            <div className="flex items-center justify-between">
+                <Link href="/home"><ArrowLeft /> Back to Home</Link>
+
+
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-4">
+                <h1 className="text-3xl font-bold">Join the community of <span className="text-amber-700">builders and innovators</span></h1>
+                <p className="text-muted-foreground">Unlock your full potential with Innatevoid</p>
+            </div>
 
             <Card className="p-6">
                 <CardHeader>
@@ -46,6 +58,9 @@ export default function RegisterPage() {
                             <Input {...register("password")} placeholder="Password" />
                             <Button type="submit">Register</Button>
 
+
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
 
                         </div>
                     </form>

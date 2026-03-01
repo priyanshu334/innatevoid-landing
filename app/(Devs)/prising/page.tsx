@@ -21,7 +21,7 @@ export default function Page() {
                 </Badge>
 
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                    Simple & Transparent Pricing
+                    Pricing
                 </h1>
 
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
