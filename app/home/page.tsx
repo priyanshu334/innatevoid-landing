@@ -37,17 +37,17 @@ export default function Home() {
                 </p>
 
                 <div className="animate-item flex flex-wrap justify-center gap-4 pt-4">
-                    <Button size="lg" className="rounded-full px-8 h-14 text-lg bg-amber-600 hover:bg-amber-700 text-white gap-2 group">
+                    <Button size="lg" className="rounded-lg px-12 py-6 text-lg bg-amber-600 hover:bg-amber-700 text-white gap-2 group">
                         Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <Button size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg gap-2">
+                    <Button size="lg" variant="outline" className="rounded- lg px-12 py-6 text-lg gap-2">
                         Join Discord
                     </Button>
                 </div>
 
                 <div className="animate-item flex items-center gap-8 pt-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                     <div className="flex items-center gap-2 font-bold text-sm">
-                        <Github className="w-5 h-5" /> GITHUB
+                        GITHUB
                     </div>
                     <div className="w-px h-4 bg-border" />
                     <div className="flex items-center gap-2 font-bold text-sm">

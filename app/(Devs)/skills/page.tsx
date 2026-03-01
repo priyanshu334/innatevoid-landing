@@ -2,8 +2,10 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
+import { useEffect, useRef } from "react"
+import gsap from "gsap"
 
 const Prompts = [
     {
@@ -26,9 +28,24 @@ const Prompts = [
     }
 ]
 export default function Page() {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(".animate-item", {
+                y: 30,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power3.out",
+                delay: 0.5
+            });
+        }, containerRef);
+        return () => ctx.revert();
+    }, []);
     const router = useRouter()
     return (
-        <div className="flex flex-col gap-4 min-h-screen px-6 py-4 max-w-6xl mx-auto">
+        <div ref={containerRef} className="flex flex-col gap-4 min-h-screen px-6 py-4 max-w-6xl mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 ">
                 <h1 className="text-4xl font-bold tracking-tighter">Prompt <span className="text-amber-600">HUB</span></h1>
                 <p className="text-muted-foreground text-lg">A collection of prompts for AI</p>
@@ -55,8 +72,13 @@ export default function Page() {
                                 </div>
 
                             </div>
+
                         </CardHeader>
 
+
+                        <CardContent>
+                            <p>{prompt.prompt}</p>
+                        </CardContent>
 
                         <CardFooter>
                             <Button>View Prompt</Button>

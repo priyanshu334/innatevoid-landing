@@ -29,8 +29,8 @@ const NavItems = [
         children: [
             { title: "Prompts Library", href: "/promptLib" },
             { title: "Develope skills", href: "/skills" },
-            { title: "Templates", href: "#" },
-            { title: "Automations", href: "#" },
+            { title: "Templates", href: "/templates" },
+            { title: "Automations", href: "/automations" },
         ],
     },
     {
@@ -38,8 +38,8 @@ const NavItems = [
         href: "#",
         children: [
             { title: "Discord Community", href: "#" },
-            { title: "Latest Blogs", href: "#" },
-            { title: "Documentation", href: "#" },
+            { title: "Latest Blogs", href: "https://blogs-next-liard.vercel.app/" },
+            { title: "Documentation", href: "/docs" },
         ],
     },
     {
@@ -48,7 +48,7 @@ const NavItems = [
     },
     {
         title: "Pricing",
-        href: "#",
+        href: "/prising",
     },
 ];
 
@@ -190,8 +190,8 @@ export function Navbar() {
                             </div>
                         ))}
                         <div className="pt-8 border-t border-border mt-4 flex flex-col gap-4">
-                            <Button className="w-full  py-6 text-lg font-bold rounded-full bg-amber-800 text-white">Join Now</Button>
-                            <Button variant="outline" className="w-full rounded-full py-6 text-lg">Login</Button>
+                            <Button className="w-full  py-6 text-lg font-bold rounded-lg bg-amber-800 text-white">Join Now</Button>
+                            <Button variant="outline" className="w-full rounded-lg py-6 text-lg">Login</Button>
                         </div>
                     </div>
                 </div>

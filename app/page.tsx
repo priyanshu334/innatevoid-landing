@@ -73,7 +73,7 @@ export default function Home() {
           <Button
             onClick={() => router.push("/home")}
             size="lg"
-            className="px-10 py-8 text-xl font-bold rounded-full shadow-2xl shadow-primary/20 hover:scale-105 transition-all duration-300 group gap-2 bg-amber-800 text-white"
+            className="px-10 py-8 text-xl font-bold rounded-full shadow-2xl shadow-primary/20 hover:scale-105 transition-all duration-300 group gap-2 bg-amber-800 text-white hover:bg-amber-900 hover:text-white"
           >
             Start Your Journey <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </Button>
