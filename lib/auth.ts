@@ -1,7 +1,7 @@
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { sessions, users } from "@/lib/schema";
 import { eq, and, gt } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 export async function getCurrentUser() {
     const sessionId = (await cookies()).get("sessionId")?.value;

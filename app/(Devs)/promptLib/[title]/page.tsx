@@ -16,7 +16,7 @@ export default async function PromptDetailPage({
         redirect("/login");
     }
 
-    const result = await fetch(`/api/pompts/title/${title}`)
+    const result = await fetch(`/api/pompts/${title}`)
     const prompt = await result.json()
     return (
         <div className="min-h-screen px-6 py-10 max-w-4xl mx-auto space-y-6">

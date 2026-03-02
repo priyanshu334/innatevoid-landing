@@ -35,7 +35,6 @@ const NavItems = [
             { title: "Prompts Library", href: "/promptLib" },
             { title: "Develope skills", href: "/skills" },
             { title: "Templates", href: "/templates" },
-            { title: "Automations", href: "/automations" },
             { title: "Roadmaps", href: "/resourses/roadmaps" }
 
         ],
