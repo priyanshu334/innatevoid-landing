@@ -5,8 +5,10 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ArrowRight, Github } from "lucide-react";
 import { useRouter } from "next/navigation";
+// import { getCurrentUser } from "@/lib/auth";
 
 export default function Home() {
+
     const router = useRouter()
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +25,24 @@ export default function Home() {
         }, containerRef);
         return () => ctx.revert();
     }, []);
+
+    useEffect(() => {
+        GetUser();
+    }, []);
+    const GetUser = async () => {
+        try {
+            const res = await fetch("/api/me");
+            const data = await res.json();
+            if (!data.user) {
+                router.push("/login");
+            }
+        } catch (error) {
+            router.push("/login");
+        }
+    }
+
+
+
 
     return (
         <div ref={containerRef} className="pt-20 px-6 max-w-6xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
@@ -47,7 +67,7 @@ export default function Home() {
                     </Button>
                 </div>
 
-                <div className="animate-item flex items-center gap-8 pt-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                <div className=" flex items-center gap-8 pt-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                     <div className="flex items-center gap-2 font-bold text-sm">
                         GITHUB
                     </div>
@@ -59,7 +79,16 @@ export default function Home() {
                     <div className="flex items-center gap-2 font-bold text-sm">
                         TECHCRUNCH
                     </div>
+                    <div className="w-px h-4 bg-border" />
+                    <div className="flex items-center gap-2 font-bold text-sm">
+                        X
+                    </div>
                 </div>
+
+
+
+
+
             </div>
         </div>
     );

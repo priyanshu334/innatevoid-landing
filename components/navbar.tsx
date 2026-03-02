@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Menu, Settings, X } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ModeToggle } from "./ModeToggle";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
+// import { getCurrentUser } from "@/lib/auth"; // Remove this
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const NavItems = [
     {
@@ -46,6 +50,14 @@ const NavItems = [
         ],
     },
     {
+        title: "Language",
+        href: "#",
+        children: [
+            { title: "English", href: "#" },
+            { title: "Hindi", href: "#" },
+        ],
+    },
+    {
         title: "About",
         href: "/about",
     },
@@ -53,14 +65,32 @@ const NavItems = [
         title: "Pricing",
         href: "/prising",
     },
+
 ];
 
 export function Navbar() {
-    const router = useRouter()
+    const router = useRouter();
     const navRef = useRef<HTMLElement>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Fetch User Session
+        const checkUser = async () => {
+            try {
+                const res = await fetch("/api/me");
+                const data = await res.json();
+                setUser(data.user);
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        checkUser();
+
+        // Animation
         const ctx = gsap.context(() => {
             gsap.from(navRef.current, {
                 y: -50,
@@ -74,68 +104,51 @@ export function Navbar() {
         return () => ctx.revert();
     }, []);
 
+    const handleLogout = async () => {
+        await fetch("/api/logout", { method: "POST" });
+        setUser(null);
+        router.push("/");
+        router.refresh(); // Refresh server components
+    };
+
+
+
     return (
         <>
-            <nav
-                ref={navRef}
-                className="
-          fixed
-          top-8
-          left-1/2
-          -translate-x-1/2
-          z-50
-          w-[95%]
-          md:w-[85%]
-          lg:w-[75%]
-          xl:w-[65%]
-          flex
-          items-center
-          justify-between
-          px-6
-          py-3
-          bg-background/70
-          backdrop-blur-xl
-          border
-          border-border/50
-          rounded-2xl
-          shadow-[0_8px_32px_rgba(0,0,0,0.12)]
-          dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-        "
-            >
+            <nav ref={navRef} className="fixed top-8 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[85%] lg:w-[75%] xl:w-[65%] flex items-center justify-between px-6 py-3 bg-background/70 backdrop-blur-xl border border-border/50 rounded-2xl shadow-xl">
+
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="w-9 h-9 bg-primary rounded-xl rotate-3 group-hover:rotate-12 transition-transform duration-300 flex items-center justify-center">
                         <div className="w-4 h-4 bg-background rounded-full animate-pulse" />
                     </div>
                     <span className="text-xl font-black tracking-tighter">
-                        Innate<span className="text-primary italic">void</span>
+                        Innate<span className="text-amber-600 italic">void</span>
                     </span>
                 </Link>
 
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation (Center) */}
                 <div className="hidden lg:flex items-center gap-1">
                     {NavItems.map((item) => (
                         <div key={item.title}>
                             {item.children ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="gap-1 hover:bg-primary/10 hover:text-primary transition-all rounded-full px-4">
+                                        <Button variant="ghost" size="sm" className="gap-1 hover:bg-primary/10 rounded-full px-4">
                                             {item.title}
                                             <ChevronDown className="w-4 h-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="center" className="min-w-[160px] rounded-xl p-2">
+                                    <DropdownMenuContent align="center" className="min-w-[180px] rounded-xl p-2">
                                         {item.children.map((child) => (
                                             <DropdownMenuItem key={child.title} asChild>
-                                                <Link href={child.href} className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium">
-                                                    {child.title}
-                                                </Link>
+                                                <Link href={child.href} className="cursor-pointer">{child.title}</Link>
                                             </DropdownMenuItem>
                                         ))}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <Button variant="ghost" size="sm" asChild className="hover:bg-primary/10 hover:text-primary transition-all rounded-full px-4 text-sm font-medium">
+                                <Button variant="ghost" size="sm" asChild className="rounded-full px-4">
                                     <Link href={item.href}>{item.title}</Link>
                                 </Button>
                             )}
@@ -143,21 +156,62 @@ export function Navbar() {
                     ))}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-2">
+                {/* Right Side Actions */}
+                <div className="flex items-center gap-3">
                     <div className="hidden sm:block">
                         <ModeToggle />
                     </div>
-                    <Button onClick={() => router.push("/login")} variant="ghost" size="sm" className="hidden md:flex ">
-                        Login
-                    </Button>
-                    <Button
-                        onClick={() => router.push("/register")}
-                        size="sm"
-                        className="px-6 font-bold shadow-sm shadow-amber-800 transition-all hover:scale-105 bg-amber-800 text-white hover:bg-amber-900"
-                    >
-                        Join Now
-                    </Button>
+
+                    {loading ? (
+                        <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+                    ) : user ? (
+                        /* PROFILE DROPDOWN */
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="relative h-9 w-9 rounded-full border border-border/50 p-0 overflow-hidden hover:ring-2 ring-primary/20 transition-all">
+                                    <Avatar className="h-9 w-9">
+                                        <AvatarImage src={user.image || ""} alt={user.name || "User"} />
+                                        <AvatarFallback className="bg-amber-100 text-amber-900 font-bold">
+                                            {user.name?.charAt(0) || "U"}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 mt-2 rounded-2xl p-2" align="end">
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col space-y-1">
+                                        <p className="text-sm font-bold leading-none">{user.name}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => router.push("/dashboard")} className="cursor-pointer rounded-lg">
+                                    <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer rounded-lg">
+                                    <Settings className="mr-2 h-4 w-4" /> Settings
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer rounded-lg">
+                                    <LogOut className="mr-2 h-4 w-4" /> Log out
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        /* AUTH BUTTONS */
+                        <div className="flex items-center gap-2">
+                            <Button onClick={() => router.push("/login")} variant="ghost" size="sm" className="hidden md:flex rounded-full px-5">
+                                Login
+                            </Button>
+                            <Button
+                                onClick={() => router.push("/register")}
+                                size="sm"
+                                className="px-6 font-bold rounded-full shadow-lg shadow-amber-900/20 transition-all hover:scale-105 bg-amber-800 text-white hover:bg-amber-900"
+                            >
+                                Join Now
+                            </Button>
+                        </div>
+                    )}
 
                     {/* Mobile Toggle */}
                     <Button

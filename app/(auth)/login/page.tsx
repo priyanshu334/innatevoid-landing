@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,30 +11,38 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import gsap from "gsap";
 
-const schema = z
-    .object({
-        email: z
-            .string()
-            .min(1, "Email is required")
-            .email("Please enter a valid email"),
-        password: z
-            .string()
-            .min(8, "Password must be at least 8 characters")
-            .regex(/[A-Z]/, "Must include at least one uppercase letter")
-            .regex(/[0-9]/, "Must include at least one number"),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
-    });
+const schema = z.object({
+    email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Please enter a valid email"),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters")
+});
 
 type LoginSchema = z.infer<typeof schema>;
 
-export default function RegisterPage() {
+export default function LoginPage() {
+    const containerRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(".animate-item", {
+                y: 30,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power3.out",
+                delay: 0.5
+            });
+        }, containerRef);
+        return () => ctx.revert();
+    }, [])
 
     const {
         register,
@@ -48,22 +56,31 @@ export default function RegisterPage() {
         try {
             setLoading(true);
 
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
 
-            toast.success("Account created successfully 🎉");
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || "Failed to login");
+            }
+
+            toast.success("Logged in successfully 🎉");
             router.push("/home");
-
-            console.log(data);
-        } catch (error) {
-            toast.error("Something went wrong");
+        } catch (error: any) {
+            toast.error(error.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center px-6 bg-background">
+        <div ref={containerRef} className="flex min-h-screen items-center justify-center px-6 bg-background">
             <div className="w-full max-w-md space-y-6">
 
                 {/* Back Button */}
@@ -76,24 +93,24 @@ export default function RegisterPage() {
                 </Link>
 
                 {/* Heading */}
-                <div className="text-center space-y-2">
+                <div className="animate-item text-center space-y-2">
                     <h1 className="text-3xl font-bold leading-tight">
-                        Join the community of{" "}
+                        Welcome to{" "}
                         <span className="bg-gradient-to-r from-amber-600 to-yellow-400 bg-clip-text text-transparent">
-                            builders & innovators
+                            Innatevoid
                         </span>
                     </h1>
                     <p className="text-muted-foreground text-sm">
-                        Unlock your full potential with Innatevoid
+                        Experience the next generation of building
                     </p>
                 </div>
 
                 {/* Card */}
-                <Card className="shadow-lg">
+                <Card className="animate-item shadow-lg">
                     <CardHeader>
-                        <CardTitle>Create Account</CardTitle>
+                        <CardTitle>Login</CardTitle>
                         <CardDescription>
-                            Enter your details to get started
+                            Welcome back! Enter your details to login
                         </CardDescription>
                     </CardHeader>
 
@@ -131,39 +148,25 @@ export default function RegisterPage() {
                                 )}
                             </div>
 
-                            {/* Confirm Password */}
-                            <div className="space-y-1">
-                                <Input
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    {...register("confirmPassword")}
-                                />
-                                {errors.confirmPassword && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.confirmPassword.message}
-                                    </p>
-                                )}
-                            </div>
-
                             {/* Submit */}
                             <Button
                                 type="submit"
                                 className="w-full"
                                 disabled={loading}
                             >
-                                {loading ? "Creating account..." : "Create Account"}
+                                {loading ? "Logging in..." : "Login"}
                             </Button>
                         </form>
                     </CardContent>
 
                     <CardFooter className="flex justify-center text-sm">
                         <p>
-                            Already have an account?{" "}
+                            Don't have an account?{" "}
                             <Link
-                                href="/login"
+                                href="/register"
                                 className="text-amber-600 hover:underline"
                             >
-                                Login
+                                Register
                             </Link>
                         </p>
                     </CardFooter>

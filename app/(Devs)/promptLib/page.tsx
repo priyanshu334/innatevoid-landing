@@ -4,29 +4,20 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
-const Prompts = [
-    {
-        title: "devops",
-        description: "devops is a good tool",
-        image: "",
 
-        prompt: "nenovim",
-        tags: "setting up devops",
-        difficulty: "easy"
-    },
-    {
-        title: "ai",
-        description: "ai is a good tool",
-        image: "",
-
-        prompt: "",
-        tags: "",
-        difficulty: ""
-    }
-]
 export default function Page() {
     const router = useRouter()
+    const [prompts, setPrompts] = useState<any[]>([])
+    useEffect(() => {
+        const fetchPrompts = async () => {
+            const res = await fetch("/api/prompts")
+            const data = await res.json()
+            setPrompts(data.data)
+        }
+        fetchPrompts()
+    }, [])
     return (
         <div className="flex flex-col gap-4 min-h-screen px-6 py-4 max-w-6xl mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 ">
@@ -39,7 +30,7 @@ export default function Page() {
                 </Badge>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Prompts.map((prompt, index) => (
+                {prompts.map((prompt, index) => (
 
                     <Card key={index} onClick={() => (router.push(`/promptLib/${prompt.title}`))}>
                         <CardHeader>

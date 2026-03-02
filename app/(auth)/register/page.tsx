@@ -48,15 +48,27 @@ export default function RegisterPage() {
         try {
             setLoading(true);
 
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: data.email,
+                    password: data.password
+                })
+            })
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || "Failed to create account")
+            }
 
             toast.success("Account created successfully 🎉");
             router.push("/home");
-
-            console.log(data);
-        } catch (error) {
-            toast.error("Something went wrong");
+        } catch (error: any) {
+            toast.error(error.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
