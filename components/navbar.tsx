@@ -190,6 +190,11 @@ export function Navbar() {
                                 <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer rounded-lg">
                                     <Settings className="mr-2 h-4 w-4" /> Settings
                                 </DropdownMenuItem>
+                                {user.role === "admin" ? (
+                                    <DropdownMenuItem onClick={() => router.push("/admin")} className="cursor-pointer rounded-lg">
+                                        <LayoutDashboard className="mr-2 h-4 w-4" /> Admin Panel
+                                    </DropdownMenuItem>
+                                ) : null}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer rounded-lg">
                                     <LogOut className="mr-2 h-4 w-4" /> Log out
