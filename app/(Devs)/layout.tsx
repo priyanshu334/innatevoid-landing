@@ -1,4 +1,5 @@
-import { Navbar } from "@/components/navbar";
+// Removed Navbar import
+
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem } from "@/components/ui/breadcrumb";
 
@@ -13,7 +14,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             </div> */}
 
             {/* Floating Navbar */}
-            <Navbar />
+            {/* Floating Navbar removed as it is now global */}
+
 
             {/* Main Content Area */}
             <main className="pt-24">

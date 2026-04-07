@@ -23,7 +23,7 @@ const NavItems = [
         title: "Products",
         href: "#",
         children: [
-            { title: "SaaS Platform", href: "#" },
+            { title: "SaaS Platform", href: "/products/saas-pltforms" },
             { title: "Mobile Apps", href: "#" },
             { title: "API Solutions", href: "#" },
         ],
@@ -35,7 +35,7 @@ const NavItems = [
             { title: "Prompts Library", href: "/promptLib" },
             { title: "Develope skills", href: "/skills" },
             { title: "Templates", href: "/templates" },
-            { title: "Roadmaps", href: "/resourses/roadmaps" }
+            { title: "Roadmaps", href: "/roadmaps" }
 
         ],
     },
@@ -48,21 +48,10 @@ const NavItems = [
             { title: "Documentation", href: "/docs" },
         ],
     },
-    {
-        title: "Language",
-        href: "#",
-        children: [
-            { title: "English", href: "#" },
-            { title: "Hindi", href: "#" },
-        ],
-    },
-    {
-        title: "About",
-        href: "/about",
-    },
+
     {
         title: "Pricing",
-        href: "/prising",
+        href: "/pricing",
     },
 
 ];

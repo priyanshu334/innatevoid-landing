@@ -60,7 +60,7 @@ export default function Page() {
 
 
                         <CardFooter>
-                            <Button>View Prompt</Button>
+                            <Button>View Roadmap</Button>
                         </CardFooter>
                     </Card>
                 ))}

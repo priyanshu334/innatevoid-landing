@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ArrowRight, BookOpen, Compass, FolderKanban, Sparkles, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Navbar } from "@/components/navbar";
+// Removed Navbar import
 
 export default function Home() {
     const router = useRouter()
@@ -51,7 +51,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-background">
-            <Navbar />
+            {/* Navbar removed as it is now global */}
 
             <main ref={containerRef} className="pt-32 pb-20 px-6 max-w-6xl mx-auto space-y-12">
                 <section className="animate-item">
