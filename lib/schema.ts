@@ -45,4 +45,22 @@ export const contact = pgTable("contact", {
     email: varchar("email", { length: 255 }).notNull().unique(),
     message: text("message").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+});
+
+// Roadmaps table
+export const roadmaps = pgTable("roadmaps", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    description: text("description").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Skills table (belongs to a roadmap)
+export const skills = pgTable("skills", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    roadmapId: uuid("roadmap_id").references(() => roadmaps.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});

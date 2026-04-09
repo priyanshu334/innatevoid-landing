@@ -12,66 +12,60 @@ import {
 } from "@/components/ui/table"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { Pencil, Trash2, Plus, FileText } from "lucide-react"
+import { Pencil, Trash2, Plus, Map } from "lucide-react"
 import { toast } from "sonner"
 
-export default function PromptsPage() {
-    const [prompts, setPrompts] = useState<any[]>([])
+export default function RoadmapsAdminPage() {
+    const [roadmaps, setRoadmaps] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
-    async function loadPrompts() {
-        const res = await fetch("/api/admin/prompts", { cache: "no-store" })
+    async function loadRoadmaps() {
+        const res = await fetch("/api/admin/roadmaps")
         const data = await res.json()
-        setPrompts(Array.isArray(data) ? data : [])
+        setRoadmaps(Array.isArray(data) ? data : [])
         setLoading(false)
     }
 
     useEffect(() => {
-        loadPrompts()
+        loadRoadmaps()
     }, [])
 
-    async function handleDelete(slug: string, title: string) {
-        if (!confirm(`Delete prompt "${title}"?`)) return
-        const res = await fetch(`/api/admin/prompts/${slug}`, { method: "POST" })
+    async function handleDelete(id: string, title: string) {
+        if (!confirm(`Delete roadmap "${title}"? This may affect linked skills.`)) return
+        const res = await fetch(`/api/admin/roadmaps/${id}`, { method: "DELETE" })
         if (res.ok) {
-            toast.success(`Prompt "${title}" deleted`)
-            setPrompts((prev) => prev.filter((p) => p.slug !== slug))
+            toast.success(`Roadmap "${title}" deleted`)
+            setRoadmaps((prev) => prev.filter((r) => r.id !== id))
         } else {
-            toast.error("Failed to delete prompt")
+            toast.error("Failed to delete roadmap")
         }
-    }
-
-    const difficultyColor: Record<string, string> = {
-        easy: "bg-green-500/10 text-green-600 border-green-500/20",
-        medium: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-        hard: "bg-red-500/10 text-red-600 border-red-500/20",
     }
 
     return (
         <div className="w-full p-6 md:p-10 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Prompts</h1>
+                    <h1 className="text-3xl font-bold">Roadmaps</h1>
                     <p className="text-muted-foreground text-sm mt-1">
-                        Manage all AI prompts
+                        Manage learning roadmaps
                     </p>
                 </div>
-                <Link href="/admin/prompts/create">
+                <Link href="/admin/roadmaps/create">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
-                        Create Prompt
+                        Create Roadmap
                     </Button>
                 </Link>
             </div>
 
             {loading ? (
                 <p className="text-muted-foreground">Loading…</p>
-            ) : prompts.length === 0 ? (
+            ) : roadmaps.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-3">
-                    <FileText className="h-12 w-12 opacity-30" />
-                    <p className="text-lg">No prompts yet.</p>
-                    <Link href="/admin/prompts/create">
-                        <Button variant="outline">Create your first prompt</Button>
+                    <Map className="h-12 w-12 opacity-30" />
+                    <p className="text-lg">No roadmaps yet.</p>
+                    <Link href="/admin/roadmaps/create">
+                        <Button variant="outline">Create your first roadmap</Button>
                     </Link>
                 </div>
             ) : (
@@ -81,41 +75,29 @@ export default function PromptsPage() {
                             <TableRow>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Slug</TableHead>
-                                <TableHead>Difficulty</TableHead>
-                                <TableHead>Status</TableHead>
+                                <TableHead>Description</TableHead>
                                 <TableHead>Created</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {prompts.map((p) => (
-                                <TableRow key={p.id}>
-                                    <TableCell className="font-medium max-w-xs truncate">{p.title}</TableCell>
+                            {roadmaps.map((roadmap) => (
+                                <TableRow key={roadmap.id}>
+                                    <TableCell className="font-medium">{roadmap.title}</TableCell>
                                     <TableCell>
                                         <Badge variant="secondary" className="font-mono text-xs">
-                                            {p.slug}
+                                            {roadmap.slug}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        {p.difficulty ? (
-                                            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${difficultyColor[p.difficulty.toLowerCase()] ?? ""}`}>
-                                                {p.difficulty}
-                                            </span>
-                                        ) : (
-                                            <span className="text-muted-foreground text-xs italic">—</span>
-                                        )}
+                                    <TableCell className="text-muted-foreground max-w-xs truncate">
+                                        {roadmap.description}
                                     </TableCell>
-                                    <TableCell>
-                                        <Badge variant={p.status === "published" ? "default" : "outline"}>
-                                            {p.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
-                                        {new Date(p.createdAt).toLocaleDateString()}
+                                    <TableCell className="text-muted-foreground text-sm">
+                                        {new Date(roadmap.createdAt).toLocaleDateString()}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <Link href={`/admin/prompts/${p.slug}`}>
+                                            <Link href={`/admin/roadmaps/${roadmap.id}`}>
                                                 <Button variant="ghost" size="icon">
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
@@ -124,7 +106,7 @@ export default function PromptsPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 className="text-destructive hover:text-destructive"
-                                                onClick={() => handleDelete(p.slug, p.title)}
+                                                onClick={() => handleDelete(roadmap.id, roadmap.title)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

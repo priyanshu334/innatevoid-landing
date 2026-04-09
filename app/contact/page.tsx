@@ -4,9 +4,48 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Mail, MessageSquare, Send } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import z from "zod"
 
+const ContactSchema = z.object({
+  name: z.string(),
+  email: z.string(),
+  message: z.string(),
+})
 export default function ContactPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof ContactSchema>>({
+    resolver: zodResolver(ContactSchema),
+  })
+
+  const onSubmit = async (data: z.infer<typeof ContactSchema>) => {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await res.json();
+      if (result.success) {
+        toast.success("Message sent successfully!");
+
+      } else {
+        toast.error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background pt-32 pb-20 px-6">
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-start">
@@ -44,42 +83,44 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
 
-        <Card className="border-border/50 shadow-2xl shadow-primary/5">
-          <CardHeader>
-            <CardTitle className="text-2xl">Send a Message</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">First Name</label>
-                <Input placeholder="John" />
+          <Card className="border-border/50 shadow-2xl shadow-primary/5">
+            <CardHeader>
+              <CardTitle className="text-2xl">Send a Message</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Name</label>
+                  <Input placeholder="John" {...register("name")} />
+                  {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+                </div>
+
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Last Name</label>
-                <Input placeholder="Doe" />
+                <label className="text-sm font-medium">Email Address</label>
+                <Input placeholder="john@example.com" type="email" {...register("email")} />
+                {errors.email && <p className="text-red-500">{errors.email.message}</p>}
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email Address</label>
-              <Input placeholder="john@example.com" type="email" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Subject</label>
-              <Input placeholder="How can we help?" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Message</label>
-              <Textarea
-                placeholder="Tell us more about your project..."
-                className="min-h-[150px]"
-              />
-            </div>
-            <Button className="w-full py-6 text-lg font-bold gap-2">
-              Send Message <Send className="w-5 h-5" />
-            </Button>
-          </CardContent>
-        </Card>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Message</label>
+                <Textarea
+                  placeholder="Tell us more about your project..."
+                  className="min-h-[150px]"
+                  {...register("message")}
+                />
+                {errors.message && <p className="text-red-500">{errors.message.message}</p>}
+              </div>
+              <Button className="w-full py-6 text-lg font-bold gap-2">
+                Send Message <Send className="w-5 h-5" />
+              </Button>
+            </CardContent>
+          </Card>
+        </form>
+
+
       </div>
     </div>
   )

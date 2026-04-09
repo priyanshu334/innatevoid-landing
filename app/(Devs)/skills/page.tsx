@@ -1,92 +1,163 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
-import { useEffect, useRef } from "react"
-import gsap from "gsap"
+import Loading from "@/app/loading";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { GraduationCap, ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
-const Prompts = [
-    {
-        title: "devops",
-        description: "devops is a good tool",
-        image: "",
+type Skill = {
+  id: string;
+  name: string;
+  description: string | null;
+  roadmapId: string | null;
+  createdAt: string;
+  updatedAt?: string;
+};
 
-        prompt: "nenovim",
-        tags: "setting up devops",
-        difficulty: "easy"
-    },
-    {
-        title: "ai",
-        description: "ai is a good tool",
-        image: "",
+export default function SkillsPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const router = useRouter();
 
-        prompt: "",
-        tags: "",
-        difficulty: ""
+  useEffect(() => {
+    async function getSkills() {
+      try {
+        const res = await fetch("/api/skills", { cache: "no-store" });
+        const data = await res.json();
+        setSkills(Array.isArray(data) ? data : []);
+      } finally {
+        setLoading(false);
+      }
     }
-]
-export default function Page() {
-    const containerRef = useRef<HTMLDivElement>(null);
+    getSkills();
+  }, []);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.from(".animate-item", {
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.2,
-                ease: "power3.out",
-                delay: 0.5
-            });
-        }, containerRef);
-        return () => ctx.revert();
-    }, []);
-    const router = useRouter()
-    return (
-        <div ref={containerRef} className="flex flex-col gap-4 min-h-screen px-6 py-4 max-w-6xl mx-auto">
-            <div className="flex flex-col items-center justify-center space-y-4 ">
-                <h1 className="text-4xl font-bold tracking-tighter">Prompt <span className="text-amber-600">HUB</span></h1>
-                <p className="text-muted-foreground text-lg">A collection of prompts for AI</p>
-                <Badge variant="secondary" className="px-6  py-3 text-xs font-bold tracking-tight rounded-2xl animate-pulse flex items-center gap-2">
-                    To Access prompts you need to be a member of Innatevoid
-                    <Button className="ml-2" variant="default">Get Started</Button>
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".animate-item", {
+        y: 24,
+        opacity: 0,
+        duration: 0.65,
+        stagger: 0.08,
+        ease: "power3.out",
+        delay: 0.15,
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [loading, skills.length]);
 
-                </Badge>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Prompts.map((prompt, index) => (
+  if (loading) {
+    return <Loading />;
+  }
 
-                    <Card key={index} onClick={() => (router.push(`/promptLib/${prompt.title}`))}>
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <CardTitle>{prompt.title}</CardTitle>
-                                    <CardDescription>{prompt.description}</CardDescription>
-                                </div>
-                                <div>
-                                    <Badge variant="secondary" className="px-4 py-1 text-xs font-bold tracking-tight">
-                                        {prompt.difficulty}
-                                    </Badge>
-                                </div>
+  return (
+    <div
+      ref={containerRef}
+      className="relative min-h-screen px-4 pb-20 pt-4 sm:px-6 md:px-8"
+    >
+      <div className="pointer-events-none absolute right-0 top-24 h-[380px] w-[380px] rounded-full bg-orange-500/10 blur-[100px]" />
 
-                            </div>
+      <div className="relative mx-auto max-w-6xl space-y-12">
+        <header className="animate-item mx-auto max-w-3xl space-y-6 text-center">
+          <Badge
+            variant="secondary"
+            className="border border-border/60 bg-background/80 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm"
+          >
+            <Sparkles className="mr-1 inline h-3.5 w-3.5 text-amber-600" />
+            Skill stack
+          </Badge>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-black tracking-tighter sm:text-5xl md:text-6xl">
+              Skills{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-500 to-orange-600">
+                Hub
+              </span>
+            </h1>
+            <p className="text-lg text-muted-foreground md:text-xl">
+              Practical skills tied to roadmaps—deepen what you need for your next ship.
+            </p>
+          </div>
 
-                        </CardHeader>
+          <Card className="mx-auto max-w-xl border-border/60 bg-muted/30 text-left shadow-sm backdrop-blur-sm">
+            <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Members get curated paths and updates as we add new skills.
+              </p>
+              <Button asChild size="sm" className="shrink-0">
+                <Link href="/register">Join InnateVoid</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </header>
 
-
-                        <CardContent>
-                            <p>{prompt.prompt}</p>
-                        </CardContent>
-
-                        <CardFooter>
-                            <Button>View Prompt</Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-
-            </div>
-        </div>
-    )
+        {skills.length === 0 ? (
+          <Card className="animate-item border-dashed border-border/70 bg-muted/20 py-16 text-center">
+            <CardContent className="space-y-3">
+              <GraduationCap className="mx-auto h-10 w-10 text-muted-foreground" />
+              <p className="font-medium">No skills published yet</p>
+              <p className="text-sm text-muted-foreground">
+                Roadmaps and skills will appear here as they go live.
+              </p>
+              <Button variant="outline" asChild>
+                <Link href="/roadmaps">View roadmaps</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {skills.map((skill) => (
+              <Card
+                key={skill.id}
+                className="animate-item group flex flex-col overflow-hidden border-border/60 bg-card/80 shadow-sm backdrop-blur-sm transition-all hover:border-primary/25 hover:shadow-md"
+              >
+                <CardHeader className="space-y-3 pb-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400">
+                      <GraduationCap className="h-5 w-5" />
+                    </div>
+                    {skill.roadmapId ? (
+                      <Badge variant="outline" className="max-w-[140px] truncate font-mono text-[10px]">
+                        Roadmap linked
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <CardTitle className="text-xl leading-tight tracking-tight">
+                    {skill.name}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-3 text-base leading-relaxed">
+                    {skill.description || "Explore this skill to see notes and resources."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 pb-2" />
+                <CardFooter className="border-t border-border/50 bg-muted/20 pt-4">
+                  <Button
+                    className="w-full gap-2"
+                    onClick={() =>
+                      router.push(`/skills/${encodeURIComponent(skill.name)}`)
+                    }
+                  >
+                    Open skill
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

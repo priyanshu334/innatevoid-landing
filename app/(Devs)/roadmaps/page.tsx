@@ -1,71 +1,147 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Map, ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const Prompts = [
-    {
-        title: "devops",
-        description: "devops is a good tool",
-        image: "",
+type Roadmap = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+};
 
-        prompt: "nenovim",
-        tags: "setting up devops",
-        difficulty: "easy"
-    },
-    {
-        title: "ai",
-        description: "ai is a good tool",
-        image: "",
+export default function RoadmapsPage() {
+  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-        prompt: "",
-        tags: "",
-        difficulty: ""
+  useEffect(() => {
+    async function getRoadmaps() {
+      try {
+        const res = await fetch("/api/roadmaps", { cache: "no-store" });
+        const data = await res.json();
+        setRoadmaps(Array.isArray(data) ? data : []);
+      } finally {
+        setLoading(false);
+      }
     }
-]
-export default function Page() {
-    const router = useRouter()
-    return (
-        <div className="flex flex-col gap-4 min-h-screen px-6 py-4 max-w-6xl mx-auto">
-            <div className="flex flex-col items-center justify-center space-y-4 ">
-                <h1 className="text-4xl font-bold tracking-tighter">Road--Maps  <span className="text-amber-600">HUB</span></h1>
-                <p className="text-muted-foreground text-lg">A collection of roadmaps for techies</p>
-                <Badge variant="secondary" className="px-6  py-3 text-xs font-bold tracking-tight rounded-2xl animate-pulse flex items-center gap-2">
-                    To Access roadmaps you need to be a member of Innatevoid
-                    <Button className="ml-2" variant="default">Get Started</Button>
+    getRoadmaps();
+  }, []);
 
-                </Badge>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  return (
+    <div className="relative min-h-screen px-4 pb-20 pt-4 sm:px-6 md:px-8">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[min(90vw,720px)] -translate-x-1/2 rounded-full bg-primary/10 blur-[100px]" />
 
-                {Prompts.map((prompt, index) => (
+      <div className="relative mx-auto max-w-6xl space-y-12">
+        <header className="mx-auto max-w-3xl space-y-6 text-center">
+          <Badge
+            variant="secondary"
+            className="border border-border/60 bg-background/80 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm"
+          >
+            <Sparkles className="mr-1 inline h-3.5 w-3.5 text-amber-600" />
+            Learning paths
+          </Badge>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-black tracking-tighter sm:text-5xl md:text-6xl">
+              Roadmaps{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-500 to-orange-600">
+                Hub
+              </span>
+            </h1>
+            <p className="text-lg text-muted-foreground md:text-xl">
+              Structured paths from fundamentals to shipping—pick a track and move with clarity.
+            </p>
+          </div>
 
-                    <Card key={index} onClick={() => (router.push(`/promptLib/${prompt.title}`))}>
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <CardTitle>{prompt.title}</CardTitle>
-                                    <CardDescription>{prompt.description}</CardDescription>
-                                </div>
-                                <div>
-                                    <Badge variant="secondary" className="px-4 py-1 text-xs font-bold tracking-tight">
-                                        {prompt.difficulty}
-                                    </Badge>
-                                </div>
+          <Card className="mx-auto max-w-xl border-border/60 bg-muted/30 text-left shadow-sm backdrop-blur-sm">
+            <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Full access and community perks are for InnateVoid members.
+              </p>
+              <Button asChild size="sm" className="shrink-0">
+                <Link href="/register">Get started</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </header>
 
-                            </div>
-                        </CardHeader>
-
-
-                        <CardFooter>
-                            <Button>View Roadmap</Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-
-            </div>
-        </div>
-    )
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="overflow-hidden border-border/50">
+                <CardHeader className="space-y-3">
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-4/5 animate-pulse rounded bg-muted" />
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        ) : roadmaps.length === 0 ? (
+          <Card className="border-dashed border-border/70 bg-muted/20 py-16 text-center">
+            <CardContent className="space-y-3">
+              <Map className="mx-auto h-10 w-10 text-muted-foreground" />
+              <p className="font-medium">No roadmaps yet</p>
+              <p className="text-sm text-muted-foreground">
+                Check back soon or explore the prompt library in the meantime.
+              </p>
+              <Button variant="outline" asChild>
+                <Link href="/promptLib">Browse prompts</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {roadmaps.map((roadmap) => (
+              <Card
+                key={roadmap.id}
+                className="group flex flex-col overflow-hidden border-border/60 bg-card/80 shadow-sm backdrop-blur-sm transition-all hover:border-primary/25 hover:shadow-md"
+              >
+                <CardHeader className="space-y-3 pb-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                      <Map className="h-5 w-5" />
+                    </div>
+                    <Badge variant="outline" className="shrink-0 font-mono text-[10px] uppercase">
+                      {roadmap.slug}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-xl leading-tight tracking-tight">
+                    {roadmap.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-3 text-base leading-relaxed">
+                    {roadmap.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 pb-2" />
+                <CardFooter className="border-t border-border/50 bg-muted/20 pt-4">
+                  <Button
+                    className="w-full gap-2"
+                    onClick={() =>
+                      router.push(`/roadmaps/${encodeURIComponent(roadmap.slug)}`)
+                    }
+                  >
+                    View roadmap
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
