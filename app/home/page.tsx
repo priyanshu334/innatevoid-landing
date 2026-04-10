@@ -2,15 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ArrowRight, BookOpen, Compass, FolderKanban, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, FolderKanban, Sparkles, Users, Zap, Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
-// Removed Navbar import
 
 export default function Home() {
-    const router = useRouter()
+    const router = useRouter();
     const containerRef = useRef<HTMLDivElement>(null);
     const [userName, setUserName] = useState<string>("Builder");
     const [isLoading, setIsLoading] = useState(true);
@@ -18,142 +17,152 @@ export default function Home() {
     useEffect(() => {
         const ctx = gsap.context(() => {
             gsap.from(".animate-item", {
-                y: 30,
+                y: 20,
                 opacity: 0,
-                duration: 0.8,
-                stagger: 0.2,
-                ease: "power3.out",
-                delay: 0.5
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power2.out",
             });
         }, containerRef);
         return () => ctx.revert();
-    }, []);
+    }, [isLoading]);
 
     useEffect(() => {
+        const getUser = async () => {
+            try {
+                const res = await fetch("/api/me");
+                const data = await res.json();
+                if (data.user) {
+                    setUserName(data.user.name?.split(' ')[0] || "Builder");
+                }
+            } catch (error) {
+                console.error("Auth error", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
         getUser();
     }, []);
-    const getUser = async () => {
-        try {
-            const res = await fetch("/api/me");
-            const data = await res.json();
-            if (!data.user) {
-                router.push("/login");
-                return;
-            }
-            setUserName(data.user.name || data.user.email || "Builder");
-        } catch (error) {
-            router.push("/login");
-            return;
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Navbar removed as it is now global */}
+        <div className="relative min-h-screen bg-background overflow-hidden">
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent -z-10" />
+            <div className="absolute top-[10%] right-[10%] w-64 h-64 bg-orange-500/10 blur-[120px] rounded-full -z-10" />
 
-            <main ref={containerRef} className="pt-32 pb-20 px-6 max-w-6xl mx-auto space-y-12">
-                <section className="animate-item">
-                    <Badge className="mb-4 bg-amber-700 text-white hover:bg-amber-800">
-                        Welcome back
-                    </Badge>
-                    <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight">
-                        {isLoading ? "Preparing your workspace..." : `Hey ${userName}, let us ship something today.`}
+            <main ref={containerRef} className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
+
+                {/* Hero Section */}
+                <section className="animate-item mb-16">
+                    <div className="flex items-center gap-2 mb-6">
+                        <Badge variant="secondary" className="px-3 py-1 border-primary/20 bg-primary/5 text-primary">
+                            <Zap className="w-3 h-3 mr-1 fill-current" /> System Online
+                        </Badge>
+                        <div className="h-[1px] w-12 bg-border" />
+                        <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Version 2.0.4</span>
+                    </div>
+
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+                        {isLoading ? (
+                            <span className="opacity-20">Initializing...</span>
+                        ) : (
+                            <>Hey {userName}, <br /><span className="text-muted-foreground">let's ship something.</span></>
+                        )}
                     </h1>
-                    <p className="text-muted-foreground text-lg mt-4 max-w-3xl">
-                        Your personalized home for prompts, docs, and product execution. Pick a direction and keep momentum.
+
+                    <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8">
+                        Your workspace is primed. Access your prompt libraries, technical documentation, and execution roadmaps in one command.
                     </p>
-                    <div className="flex flex-wrap gap-3 mt-6">
-                        <Button onClick={() => router.push("/promptLib")} className="gap-2">
-                            Open Prompt Library <ArrowRight className="w-4 h-4" />
+
+                    <div className="flex flex-wrap gap-4">
+                        <Button size="lg" onClick={() => router.push("/promptLib")} className="rounded-full px-8 shadow-lg shadow-primary/20">
+                            Prompt Library <ArrowRight className="ml-2 w-4 h-4" />
                         </Button>
-                        <Button variant="outline" onClick={() => router.push("/docs")}>
-                            Read Docs
-                        </Button>
-                        <Button variant="outline" onClick={() => router.push("/resourses/roadmaps")}>
-                            Explore Roadmaps
+                        <Button size="lg" variant="outline" onClick={() => router.push("/docs")} className="rounded-full px-8">
+                            Documentation
                         </Button>
                     </div>
                 </section>
 
-                <section className="animate-item grid gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <FolderKanban className="w-5 h-5 text-primary" />
-                                Build Queue
-                            </CardTitle>
+                {/* Main Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+
+                    {/* Primary Focus Card */}
+                    <Card className="animate-item md:col-span-8 bg-card/50 backdrop-blur-sm border-primary/10 overflow-hidden group">
+                        <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Compass className="w-6 h-6 text-primary" />
+                                </div>
+                                <Badge variant="outline">Priority 01</Badge>
+                            </div>
+                            <CardTitle className="text-2xl mt-4">Suggested next steps</CardTitle>
+                            <CardDescription>Actionable items to keep your momentum high.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                Organize ideas into execution-ready tasks and keep shipping consistently.
-                            </p>
+                        <CardContent className="pt-4">
+                            <div className="space-y-4">
+                                {[
+                                    "Complete your first prompt workflow",
+                                    "Pick a roadmap and set a 7-day milestone",
+                                    "Publish one project update"
+                                ].map((step, i) => (
+                                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-accent/50 transition-colors border border-transparent hover:border-border cursor-pointer">
+                                        <div className="flex-shrink-0 w-6 h-6 rounded-full border border-primary/30 flex items-center justify-center text-xs font-mono">
+                                            0{i + 1}
+                                        </div>
+                                        <span className="text-sm font-medium">{step}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </CardContent>
                     </Card>
-                    <Card>
+
+                    {/* Secondary Action Card */}
+                    <Card className="animate-item md:col-span-4 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground border-none shadow-xl shadow-orange-500/10">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <BookOpen className="w-5 h-5 text-primary" />
-                                Learning Path
-                            </CardTitle>
+                            <Sparkles className="w-8 h-8 mb-2" />
+                            <CardTitle className="text-2xl">Level Up</CardTitle>
+                            <CardDescription className="text-primary-foreground/80">
+                                Master AI-first workflows and scale your output.
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground">
-                                Follow practical guides designed for builders, developers, and founders.
-                            </p>
+                            <Button variant="secondary" className="w-full mt-4 group" onClick={() => router.push("/skills")}>
+                                Explore Skills
+                                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </Button>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Users className="w-5 h-5 text-primary" />
-                                Community
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                Stay accountable with a focused community sharing progress and wins.
-                            </p>
-                        </CardContent>
-                    </Card>
+                </div>
+
+                {/* Utilities Grid */}
+                <section className="animate-item grid gap-6 md:grid-cols-3">
+                    {[
+                        { title: "Build Queue", icon: FolderKanban, desc: "Organize ideas into execution-ready tasks." },
+                        { title: "Learning Path", icon: BookOpen, desc: "Practical guides designed for high-growth builders." },
+                        { title: "Community", icon: Users, desc: "Stay accountable with others sharing wins." },
+                    ].map((item, idx) => (
+                        <Card key={idx} className="bg-card/30 hover:bg-card/80 transition-all border-border/50">
+                            <CardHeader>
+                                <item.icon className="w-5 h-5 text-primary mb-2" />
+                                <CardTitle className="text-lg">{item.title}</CardTitle>
+                                <CardDescription>{item.desc}</CardDescription>
+                            </CardHeader>
+                        </Card>
+                    ))}
                 </section>
 
-                <section className="animate-item grid gap-4 md:grid-cols-2">
-                    <Card className="p-6 md:p-8">
-                        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                            <Compass className="w-5 h-5 text-primary" />
-                            Suggested next steps
-                        </h2>
-                        <ul className="space-y-3 text-muted-foreground">
-                            <li>Complete your first prompt workflow from the library.</li>
-                            <li>Pick a roadmap and set a 7-day milestone.</li>
-                            <li>Publish one project update in your community channel.</li>
-                        </ul>
-                    </Card>
-                    <Card className="p-6 md:p-8 bg-linear-to-r from-primary/10 to-orange-500/10">
-                        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-primary" />
-                            Ready to level up?
-                        </h2>
-                        <p className="text-muted-foreground mb-5">
-                            Move from learning to launching with focused systems and AI-first workflows.
-                        </p>
-                        <Button onClick={() => router.push("/skills")} className="gap-2">
-                            Explore Skills <ArrowRight className="w-4 h-4" />
-                        </Button>
-                    </Card>
-                </section>
-
-                <section className="animate-item text-center pt-2">
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                        Trusted by builders shipping every week
-                    </p>
-                    <div className="mt-4 flex flex-wrap justify-center gap-6 text-sm font-semibold text-muted-foreground">
-                        <span>GITHUB</span>
-                        <span>PRODUCT HUNT</span>
-                        <span>TECHCRUNCH</span>
-                        <span>X</span>
+                {/* Footer Social/Trust */}
+                <section className="animate-item text-center pt-20">
+                    <div className="flex items-center justify-center gap-4 mb-6">
+                        <div className="h-px w-8 bg-border" />
+                        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-bold">Trusted Network</span>
+                        <div className="h-px w-8 bg-border" />
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+                        <span className="font-black text-xl italic">GITHUB</span>
+                        <span className="font-black text-xl italic">PRODUCT HUNT</span>
+                        <span className="font-black text-xl italic">X.COM</span>
                     </div>
                 </section>
             </main>
