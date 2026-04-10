@@ -11,14 +11,15 @@ import { toast } from "sonner"
 import z from "zod"
 
 const ContactSchema = z.object({
-  name: z.string(),
-  email: z.string(),
-  message: z.string(),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Please enter a valid email"),
+  message: z.string().min(1, "Message is required"),
 })
 export default function ContactPage() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof ContactSchema>>({
     resolver: zodResolver(ContactSchema),
@@ -33,16 +34,17 @@ export default function ContactPage() {
         },
         body: JSON.stringify(data),
       })
-      const result = await res.json();
-      if (result.success) {
-        toast.success("Message sent successfully!");
+      const result = await res.json()
 
+      if (res.ok && result.success) {
+        toast.success("Message sent successfully!");
+        reset()
       } else {
-        toast.error("Failed to send message");
+        toast.error(result.error ?? "Failed to send message")
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error("Failed to send message");
+      console.error("Error sending message:", error)
+      toast.error("Failed to send message")
     }
   }
 
